@@ -210,8 +210,9 @@ private
   # stroke-opacity: stroke opacity. ranges from 0 to 1
   # opacity: Opacity for the whole element
 def write_style(style)
-   @output << %Q{  transform="#{style.delete "transform"}"} if style["transform"]
+  
     style_ = fix_style(default_style.merge(style))
+    @output << %Q{  transform="#{style_.delete "transform"}"} if style_["transform"]  
     return if style_.empty?
     @output << ' style="'
     style_.each_pair do |attribute, value|
