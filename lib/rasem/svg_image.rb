@@ -10,13 +10,13 @@ class Rasem::SVGImage
   }
 
 
-  def initialize(width, height, output=nil, &block)
+  def initialize(width, height, stylesheet="", output=nil, &block)
     @output = create_output(output)
 
     # Initialize a stack of default styles
     @default_styles = []
 
-    write_header(width, height)
+    write_header(width, height, stylesheet)
     if block
       self.instance_exec(&block)
       self.close
@@ -153,9 +153,11 @@ private
   end
 
   # Writes file header
-  def write_header(width, height)
+  def write_header(width, height, string="")
+    
     @output << <<-HEADER
 <?xml version="1.0" standalone="no"?>
+<?xml-stylesheet href='#{string}' type='text/css'?>  
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="#{width}" height="#{height}" version="1.1"
@@ -212,7 +214,9 @@ private
 def write_style(style)
   
     style_ = fix_style(default_style.merge(style))
-    @output << %Q{  transform="#{style_.delete "transform"}"} if style_["transform"]  
+    @output << %Q{  transform="#{style_.delete "transform"}"} if style_["transform"]
+    @output << %Q{  id="#{style_.delete "id"}"} if style_["id"]
+    @output << %Q{  class="#{style_.delete "class"}"} if style_["class"]
     return if style_.empty?
     @output << ' style="'
     style_.each_pair do |attribute, value|
@@ -221,4 +225,3 @@ def write_style(style)
     @output << '"'
   end
 end
-
